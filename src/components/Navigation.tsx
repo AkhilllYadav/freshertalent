@@ -3,11 +3,12 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { BriefcaseBusiness, Home, Search, MenuIcon, X } from 'lucide-react';
+import { BriefcaseBusiness, Home, Search, MenuIcon, X, Shield } from 'lucide-react';
 
 export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -20,8 +21,14 @@ export const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu when changing routes
+  // Check admin status on navigation changes
   useEffect(() => {
+    const checkAdminStatus = () => {
+      const adminStatus = localStorage.getItem('isAdminLoggedIn') === 'true';
+      setIsAdmin(adminStatus);
+    };
+    
+    checkAdminStatus();
     setIsMenuOpen(false);
   }, [location.pathname]);
 
@@ -70,6 +77,16 @@ export const Navigation = () => {
               Find Jobs
             </Button>
           </Link>
+          <Link to={isAdmin ? "/admin/dashboard" : "/admin"}>
+            <Button 
+              variant={isAdmin ? "default" : "ghost"} 
+              size="sm" 
+              className="ml-2 flex items-center"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              {isAdmin ? "Dashboard" : "Admin"}
+            </Button>
+          </Link>
         </nav>
 
         {/* Mobile Menu Button */}
@@ -111,6 +128,15 @@ export const Navigation = () => {
             <Button className="w-full justify-start">
               <Search className="h-4 w-4 mr-2" />
               Find Jobs
+            </Button>
+          </Link>
+          <Link to={isAdmin ? "/admin/dashboard" : "/admin"} className="mt-1">
+            <Button 
+              variant={isAdmin ? "default" : "outline"} 
+              className="w-full justify-start"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              {isAdmin ? "Dashboard" : "Admin"}
             </Button>
           </Link>
         </nav>
