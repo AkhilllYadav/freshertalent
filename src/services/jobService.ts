@@ -1,4 +1,3 @@
-
 import { Job, JobTag, Company } from '@/types/job';
 
 // Mock companies
@@ -67,7 +66,7 @@ const jobTags: JobTag[] = [
 ];
 
 // Mock job listings
-const jobs: Job[] = [
+let jobs: Job[] = [
   {
     id: '1',
     title: 'Frontend Developer',
@@ -447,5 +446,105 @@ export const jobService = {
     
     const recentJobs = jobs.filter(job => new Date(job.postedAt) >= oneWeekAgo);
     return simulateApiCall(recentJobs);
+  },
+
+  /**
+   * Add a new job posting
+   */
+  addJob: async (jobData: {
+    title: string;
+    companyName: string;
+    location: {
+      city: string;
+      state: string;
+      country: string;
+      remote: boolean;
+    };
+    description: string;
+    employmentType: 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship';
+    applyUrl: string;
+  }): Promise<Job> => {
+    const companyMatch = companies.find(c => c.name.toLowerCase() === jobData.companyName.toLowerCase());
+    
+    // Create company if it doesn't exist
+    const company = companyMatch || {
+      id: `company-${Date.now()}`,
+      name: jobData.companyName,
+      location: `${jobData.location.city || ''}, ${jobData.location.state || ''}`.trim(),
+    };
+    
+    if (!companyMatch) {
+      companies.push(company);
+    }
+    
+    const newJob: Job = {
+      id: `job-${Date.now()}`,
+      title: jobData.title,
+      company: company,
+      location: jobData.location,
+      employmentType: jobData.employmentType,
+      description: jobData.description,
+      requirements: [],
+      responsibilities: [],
+      tags: [],
+      postedAt: new Date().toISOString(),
+      applyUrl: jobData.applyUrl
+    };
+    
+    jobs.unshift(newJob); // Add to the beginning of the array
+    return simulateApiCall(newJob);
+  },
+  
+  /**
+   * Add multiple jobs at once (bulk upload)
+   */
+  addBulkJobs: async (jobsData: Array<{
+    title: string;
+    companyName: string;
+    location: {
+      city: string;
+      state: string;
+      country: string;
+      remote: boolean;
+    };
+    description: string;
+    employmentType: 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship';
+    applyUrl: string;
+  }>): Promise<Job[]> => {
+    const newJobs: Job[] = [];
+    
+    for (const jobData of jobsData) {
+      const companyMatch = companies.find(c => c.name.toLowerCase() === jobData.companyName.toLowerCase());
+      
+      // Create company if it doesn't exist
+      const company = companyMatch || {
+        id: `company-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        name: jobData.companyName,
+        location: `${jobData.location.city || ''}, ${jobData.location.state || ''}`.trim(),
+      };
+      
+      if (!companyMatch) {
+        companies.push(company);
+      }
+      
+      const newJob: Job = {
+        id: `job-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        title: jobData.title,
+        company: company,
+        location: jobData.location,
+        employmentType: jobData.employmentType,
+        description: jobData.description,
+        requirements: [],
+        responsibilities: [],
+        tags: [],
+        postedAt: new Date().toISOString(),
+        applyUrl: jobData.applyUrl
+      };
+      
+      newJobs.push(newJob);
+    }
+    
+    jobs = [...newJobs, ...jobs]; // Add new jobs to the beginning
+    return simulateApiCall(newJobs);
   }
 };

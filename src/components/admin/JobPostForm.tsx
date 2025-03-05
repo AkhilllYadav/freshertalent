@@ -19,7 +19,7 @@ type JobFormData = {
   };
   description: string;
   employmentType: 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship';
-  applyUrl: string; // Added new field for application URL
+  applyUrl: string;
 };
 
 const initialFormData: JobFormData = {
@@ -33,7 +33,7 @@ const initialFormData: JobFormData = {
   },
   description: '',
   employmentType: 'full-time',
-  applyUrl: '', // Initialize the apply URL as empty string
+  applyUrl: '',
 };
 
 export const JobPostForm = () => {
@@ -49,7 +49,7 @@ export const JobPostForm = () => {
       setFormData(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof JobFormData],
+          ...prev[parent as keyof typeof prev],
           [child]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
         }
       }));
@@ -65,28 +65,105 @@ export const JobPostForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // In a real app, this would connect to a real backend
-    setTimeout(() => {
-      // Mock response - in real app would submit to API
-      console.log('Posting job:', formData);
-      toast.success('Job posted successfully!');
-      setFormData(initialFormData);
-      setIsLoading(false);
-    }, 1000);
+    // Creating a job object from form data
+    const newJob = {
+      title: formData.title,
+      companyName: formData.companyName,
+      location: formData.location,
+      description: formData.description,
+      employmentType: formData.employmentType,
+      applyUrl: formData.applyUrl
+    };
+
+    // Use jobService to add the new job
+    jobService.addJob(newJob)
+      .then(() => {
+        toast.success('Job posted successfully!');
+        setFormData(initialFormData);
+      })
+      .catch(error => {
+        console.error('Error posting job:', error);
+        toast.error('Failed to post job. Please try again.');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleBulkUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // In a real app, this would process and upload the file
-    // For now, we'll just show a success message after a delay
     setIsLoading(true);
-    setTimeout(() => {
-      toast.success(`Bulk upload of ${file.name} successful!`);
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const csvContent = event.target?.result as string;
+        const rows = csvContent.split('\n');
+        
+        // Skip header row if present
+        const startRow = rows[0].includes('Title,Company') ? 1 : 0;
+        
+        const jobsToAdd = [];
+        
+        // Process each row
+        for (let i = startRow; i < rows.length; i++) {
+          const row = rows[i].trim();
+          if (!row) continue; // Skip empty rows
+          
+          const columns = row.split(',');
+          if (columns.length < 8) continue; // Skip invalid rows
+          
+          // Create job object from CSV columns
+          const job = {
+            title: columns[0].trim(),
+            companyName: columns[1].trim(),
+            location: {
+              city: columns[2].trim(),
+              state: columns[3].trim(),
+              country: columns[4].trim() || 'USA',
+              remote: columns[5].trim().toLowerCase() === 'true'
+            },
+            description: columns[6].trim(),
+            employmentType: columns[7].trim() as 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship',
+            applyUrl: columns[8]?.trim() || ''
+          };
+          
+          jobsToAdd.push(job);
+        }
+        
+        // Add all jobs to the service
+        if (jobsToAdd.length > 0) {
+          jobService.addBulkJobs(jobsToAdd)
+            .then(() => {
+              toast.success(`Successfully uploaded ${jobsToAdd.length} jobs!`);
+              setIsFileUploadOpen(false);
+            })
+            .catch(error => {
+              console.error('Error uploading jobs:', error);
+              toast.error('Failed to upload jobs. Please try again.');
+            })
+            .finally(() => {
+              setIsLoading(false);
+            });
+        } else {
+          toast.error('No valid jobs found in the uploaded file.');
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Error parsing CSV file:', error);
+        toast.error('Failed to parse uploaded file. Please check the format.');
+        setIsLoading(false);
+      }
+    };
+    
+    reader.onerror = () => {
+      toast.error('Failed to read the uploaded file.');
       setIsLoading(false);
-      setIsFileUploadOpen(false);
-    }, 1500);
+    };
+    
+    reader.readAsText(file);
   };
   
   return (
