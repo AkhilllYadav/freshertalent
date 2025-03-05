@@ -19,6 +19,7 @@ type JobFormData = {
   };
   description: string;
   employmentType: 'full-time' | 'part-time' | 'contract' | 'freelance' | 'internship';
+  applyUrl: string; // Added new field for application URL
 };
 
 const initialFormData: JobFormData = {
@@ -32,6 +33,7 @@ const initialFormData: JobFormData = {
   },
   description: '',
   employmentType: 'full-time',
+  applyUrl: '', // Initialize the apply URL as empty string
 };
 
 export const JobPostForm = () => {
@@ -116,7 +118,7 @@ export const JobPostForm = () => {
               <div className="mt-6">
                 <p className="text-sm font-medium mb-2">Template Format:</p>
                 <pre className="bg-muted p-3 rounded-md text-xs overflow-auto">
-                  Title,Company,City,State,Country,Remote,Description,EmploymentType
+                  Title,Company,City,State,Country,Remote,Description,EmploymentType,ApplyUrl
                 </pre>
               </div>
             </div>
@@ -223,6 +225,23 @@ export const JobPostForm = () => {
             className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             required
           />
+        </div>
+        
+        {/* New field for Apply URL */}
+        <div className="space-y-2">
+          <Label htmlFor="applyUrl">Application Link URL</Label>
+          <Input
+            id="applyUrl"
+            name="applyUrl"
+            type="url"
+            value={formData.applyUrl}
+            onChange={handleInputChange}
+            placeholder="https://example.com/apply"
+            required
+          />
+          <p className="text-xs text-muted-foreground">
+            External link where candidates can apply for this position
+          </p>
         </div>
         
         <Button type="submit" className="w-full" disabled={isLoading}>
