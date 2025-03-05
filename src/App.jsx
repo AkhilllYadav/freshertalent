@@ -11,6 +11,8 @@ import JobDetailPage from "./pages/JobDetailPage";
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import JoinGroups from "./pages/JoinGroups";
+import RecommendedCourses from "./pages/RecommendedCourses";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +36,8 @@ const App = () => (
             <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/admin" element={<AdminLogin />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/community" element={<JoinGroups />} />
+            <Route path="/courses" element={<RecommendedCourses />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

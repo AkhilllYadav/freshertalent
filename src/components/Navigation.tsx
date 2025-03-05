@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { BriefcaseBusiness, Home, Search, MenuIcon, X, Shield } from 'lucide-react';
+import { BriefcaseBusiness, Home, Search, MenuIcon, X, Shield, BookOpen, Users } from 'lucide-react';
 
 export const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -35,6 +35,8 @@ export const Navigation = () => {
   const navItems = [
     { href: '/', label: 'Home', icon: <Home className="h-4 w-4 mr-2" /> },
     { href: '/jobs', label: 'Jobs', icon: <BriefcaseBusiness className="h-4 w-4 mr-2" /> },
+    { href: '/courses', label: 'Courses', icon: <BookOpen className="h-4 w-4 mr-2" /> },
+    { href: '/community', label: 'Community', icon: <Users className="h-4 w-4 mr-2" /> },
   ];
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
