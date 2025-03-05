@@ -1,50 +1,31 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, Send, Share2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-const communityGroups = [
-  {
-    id: 1,
-    type: 'whatsapp',
-    title: 'Job Seekers WhatsApp Group',
-    description: 'Daily job updates, resume reviews, and interview preparation tips.',
-    members: '2.5k+',
-    link: 'https://chat.whatsapp.com/example',
-    icon: <MessageSquare className="h-6 w-6 text-green-500" />
-  },
-  {
-    id: 2,
-    type: 'telegram',
-    title: 'Career Opportunities Telegram',
-    description: 'Exclusive job postings, networking opportunities, and career resources.',
-    members: '5k+',
-    link: 'https://t.me/example',
-    icon: <Send className="h-6 w-6 text-blue-500" />
-  },
-  {
-    id: 3,
-    type: 'whatsapp',
-    title: 'Tech Jobs Community',
-    description: 'For IT professionals and tech job seekers. Industry insights and job alerts.',
-    members: '1.8k+',
-    link: 'https://chat.whatsapp.com/tech-example',
-    icon: <MessageSquare className="h-6 w-6 text-green-500" />
-  },
-  {
-    id: 4,
-    type: 'telegram',
-    title: 'Remote Work Opportunities',
-    description: 'Focus on remote and flexible work options across all industries.',
-    members: '3.2k+',
-    link: 'https://t.me/remote-example',
-    icon: <Send className="h-6 w-6 text-blue-500" />
-  }
-];
+import { getGroups } from '@/services/groupService';
 
 export const CommunityGroups = () => {
+  const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const groupsData = await getGroups();
+        setGroups(groupsData);
+      } catch (error) {
+        console.error('Error fetching groups:', error);
+        toast.error('Failed to load community groups');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
   const copyLinkToClipboard = (link) => {
     navigator.clipboard.writeText(link)
       .then(() => toast.success('Link copied to clipboard!'))
@@ -55,14 +36,35 @@ export const CommunityGroups = () => {
     window.open(link, '_blank');
   };
 
+  if (loading) {
+    return (
+      <div className="text-center py-10">
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+        <p className="mt-2">Loading community groups...</p>
+      </div>
+    );
+  }
+
+  if (groups.length === 0) {
+    return (
+      <div className="text-center py-10">
+        <p className="text-lg text-muted-foreground">No community groups found</p>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-      {communityGroups.map((group) => (
+      {groups.map((group) => (
         <Card key={group.id} className="border-2 hover:shadow-md transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {group.icon}
+                {group.type === 'whatsapp' ? (
+                  <MessageSquare className="h-6 w-6 text-green-500" />
+                ) : (
+                  <Send className="h-6 w-6 text-blue-500" />
+                )}
                 <CardTitle>{group.title}</CardTitle>
               </div>
               <span className="text-sm bg-muted rounded-full px-3 py-1">

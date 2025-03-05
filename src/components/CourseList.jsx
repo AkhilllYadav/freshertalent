@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { ExternalLink, ThumbsUp, Award, Clock } from 'lucide-react';
 import { getCourses } from '@/services/courseService';
+import { toast } from 'sonner';
 
 export const CourseList = ({ category }) => {
   const [courses, setCourses] = useState([]);
@@ -22,6 +23,7 @@ export const CourseList = ({ category }) => {
         }
       } catch (error) {
         console.error('Error fetching courses:', error);
+        toast.error('Failed to load courses');
         setCourses([]);
       } finally {
         setLoading(false);
