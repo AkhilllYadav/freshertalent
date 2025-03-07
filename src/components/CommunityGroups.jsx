@@ -15,6 +15,7 @@ export const CommunityGroups = () => {
       try {
         const groupsData = await getGroups();
         setGroups(groupsData);
+        console.log('Fetched groups:', groupsData); // Debug log
       } catch (error) {
         console.error('Error fetching groups:', error);
         toast.error('Failed to load community groups');
