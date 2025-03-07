@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,13 +45,18 @@ export const JobPostForm = () => {
     
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+      setFormData(prev => {
+        if (parent === 'location') {
+          return {
+            ...prev,
+            location: {
+              ...prev.location,
+              [child]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value
+            }
+          };
         }
-      }));
+        return prev;
+      });
     } else {
       setFormData(prev => ({
         ...prev,
@@ -65,7 +69,6 @@ export const JobPostForm = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Creating a job object from form data
     const newJob = {
       title: formData.title,
       companyName: formData.companyName,
@@ -75,7 +78,6 @@ export const JobPostForm = () => {
       applyUrl: formData.applyUrl
     };
 
-    // Use jobService to add the new job
     jobService.addJob(newJob)
       .then(() => {
         toast.success('Job posted successfully!');
@@ -102,20 +104,17 @@ export const JobPostForm = () => {
         const csvContent = event.target?.result as string;
         const rows = csvContent.split('\n');
         
-        // Skip header row if present
         const startRow = rows[0].includes('Title,Company') ? 1 : 0;
         
         const jobsToAdd = [];
         
-        // Process each row
         for (let i = startRow; i < rows.length; i++) {
           const row = rows[i].trim();
-          if (!row) continue; // Skip empty rows
+          if (!row) continue;
           
           const columns = row.split(',');
-          if (columns.length < 8) continue; // Skip invalid rows
+          if (columns.length < 8) continue;
           
-          // Create job object from CSV columns
           const job = {
             title: columns[0].trim(),
             companyName: columns[1].trim(),
@@ -133,7 +132,6 @@ export const JobPostForm = () => {
           jobsToAdd.push(job);
         }
         
-        // Add all jobs to the service
         if (jobsToAdd.length > 0) {
           jobService.addBulkJobs(jobsToAdd)
             .then(() => {
@@ -304,7 +302,6 @@ export const JobPostForm = () => {
           />
         </div>
         
-        {/* New field for Apply URL */}
         <div className="space-y-2">
           <Label htmlFor="applyUrl">Application Link URL</Label>
           <Input
