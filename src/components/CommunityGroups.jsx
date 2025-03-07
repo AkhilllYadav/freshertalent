@@ -13,9 +13,10 @@ export const CommunityGroups = () => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
+        console.log('Fetching groups...');
         const groupsData = await getGroups();
+        console.log('Fetched groups data:', groupsData);
         setGroups(groupsData);
-        console.log('Fetched groups:', groupsData); // Debug log
       } catch (error) {
         console.error('Error fetching groups:', error);
         toast.error('Failed to load community groups');

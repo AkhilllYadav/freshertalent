@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { CommunityGroups } from '@/components/CommunityGroups';
 
 const JoinGroups = () => {
+  console.log('Rendering JoinGroups page');
   return (
     <Layout>
       <div className="py-8">
