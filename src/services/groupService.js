@@ -40,6 +40,7 @@ export const getGroups = () => {
   return new Promise((resolve) => {
     // Simulating API delay
     setTimeout(() => {
+      console.log('Resolving groups data:', groupsData); // Add debug log
       resolve(groupsData);
     }, 500);
   });
