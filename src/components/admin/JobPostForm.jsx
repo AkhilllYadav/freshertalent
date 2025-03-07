@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { addJob, getJobs } from '@/services/jobService';
+import { jobService } from '@/services/jobService';
 
 export const JobPostForm = () => {
   const [formData, setFormData] = useState({
@@ -46,7 +46,7 @@ export const JobPostForm = () => {
         requirements: formData.requirements.split('\n').filter(req => req.trim() !== '')
       };
 
-      await addJob(jobData);
+      await jobService.addJob(jobData);
       
       setFormData({
         title: '',
