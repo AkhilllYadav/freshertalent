@@ -34,14 +34,12 @@ export const CommunityGroups = () => {
       .catch(() => toast.error('Failed to copy link'));
   };
 
-  const joinGroup = (link) => {
-    window.open(link, '_blank');
-  };
-
   if (loading) {
     return (
       <div className="text-center py-10">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
+        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent">
+          
+        </div>
         <p className="mt-2">Loading community groups...</p>
       </div>
     );
@@ -81,20 +79,15 @@ export const CommunityGroups = () => {
             </p>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button 
-              variant="default" 
-              onClick={() => joinGroup(group.link)}
-              className={group.type === 'whatsapp' ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}
-            >
-              Join Group
+           <Button
+                variant="default"
+                onClick={() => window.open(group.link, '_blank')}
+                className="bg-primary hover:bg-primary/80"
+              >
+                Join Group
             </Button>
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={() => copyLinkToClipboard(group.link)}
-            >
-              <Share2 className="h-4 w-4" />
-            </Button>
+           
+           
           </CardFooter>
         </Card>
       ))}
