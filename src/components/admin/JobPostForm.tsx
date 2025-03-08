@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -166,7 +167,7 @@ export const JobPostForm = () => {
   
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-2">
         <h2 className="text-xl font-semibold">Post a New Job</h2>
         
         <Sheet open={isFileUploadOpen} onOpenChange={setIsFileUploadOpen}>
