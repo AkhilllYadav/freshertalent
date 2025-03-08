@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { jobService } from '@/services/jobService';
 import { toast } from 'sonner';
@@ -39,6 +39,14 @@ export const JobPostForm = () => {
   const [formData, setFormData] = useState<JobFormData>(initialFormData);
   const [isLoading, setIsLoading] = useState(false);
   const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refresh key to force re-render
+
+  // Force a refresh when the component mounts
+  useEffect(() => {
+    console.log('JobPostForm refreshed');
+    // Force re-render by incrementing the refresh key
+    setRefreshKey(prevKey => prevKey + 1);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -93,7 +101,7 @@ export const JobPostForm = () => {
   };
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" key={refreshKey}>
       <div className="flex justify-between items-center flex-wrap gap-2">
         <h2 className="text-xl font-semibold">Post a New Job</h2>
         <BulkUploadSheet 
