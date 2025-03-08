@@ -79,16 +79,18 @@ export const Navigation = () => {
               Find Jobs
             </Button>
           </Link>
-          <Link to={isAdmin ? "/admin/dashboard" : "/admin"}>
-            <Button 
-              variant={isAdmin ? "default" : "ghost"} 
-              size="sm" 
-              className="ml-2 flex items-center"
-            >
-              <Shield className="h-4 w-4 mr-2" />
-              {isAdmin ? "Dashboard" : "Admin"}
-            </Button>
-          </Link>
+          {isAdmin && (
+            <Link to="/admin/dashboard">
+              <Button 
+                variant="default"
+                size="sm" 
+                className="ml-2 flex items-center"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -132,15 +134,17 @@ export const Navigation = () => {
               Find Jobs
             </Button>
           </Link>
-          <Link to={isAdmin ? "/admin/dashboard" : "/admin"} className="mt-1">
-            <Button 
-              variant={isAdmin ? "default" : "outline"} 
-              className="w-full justify-start"
-            >
-              <Shield className="h-4 w-4 mr-2" />
-              {isAdmin ? "Dashboard" : "Admin"}
-            </Button>
-          </Link>
+          {isAdmin && (
+            <Link to="/admin/dashboard" className="mt-1">
+              <Button 
+                variant="default"
+                className="w-full justify-start"
+              >
+                <Shield className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+          )}
         </nav>
       </div>
     </header>
