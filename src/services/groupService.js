@@ -1,101 +1,90 @@
 
-// Mock data for community groups
-const groupsData = [
-  {
-    id: 1,
-    type: 'whatsapp',
-    title: 'Job Seekers WhatsApp Group',
-    description: 'Daily job updates, resume reviews, and interview preparation tips.',
-    members: '2.5k+',
-    link: 'https://chat.whatsapp.com/example',
-  },
-  {
-    id: 2,
-    type: 'telegram',
-    title: 'Career Opportunities Telegram',
-    description: 'Exclusive job postings, networking opportunities, and career resources.',
-    members: '5k+',
-    link: 'https://t.me/example',
-  },
-  {
-    id: 3,
-    type: 'whatsapp',
-    title: 'Tech Jobs Community',
-    description: 'For IT professionals and tech job seekers. Industry insights and job alerts.',
-    members: '1.8k+',
-    link: 'https://chat.whatsapp.com/tech-example',
-  },
-  {
-    id: 4,
-    type: 'telegram',
-    title: 'Remote Work Opportunities',
-    description: 'Focus on remote and flexible work options across all industries.',
-    members: '3.2k+',
-    link: 'https://t.me/remote-example',
+// Updated groupService.js to use the backend API
+const API_URL = 'http://localhost:5000/api';
+
+export const getGroups = async () => {
+  try {
+    const response = await fetch(`${API_URL}/groups`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch groups: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log('Fetched groups from API:', data);
+    return data;
+  } catch (error) {
+    console.error('Error in getGroups:', error);
+    throw error;
   }
-];
-
-// In a real application, this would interact with an API
-export const getGroups = () => {
-  return new Promise((resolve) => {
-    // Simulating API delay
-    setTimeout(() => {
-      console.log('Resolving groups data:', groupsData); // Add debug log
-      resolve(groupsData);
-    }, 500);
-  });
 };
 
-export const getGroupById = (id) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const group = groupsData.find(group => group.id === parseInt(id));
-      if (group) {
-        resolve(group);
-      } else {
-        reject(new Error('Group not found'));
-      }
-    }, 300);
-  });
+export const getGroupById = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/groups/${id}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch group: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error('Error in getGroupById:', error);
+    throw error;
+  }
 };
 
-export const addGroup = (groupData) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const newGroup = {
-        id: Math.max(...groupsData.map(g => g.id), 0) + 1,
-        ...groupData,
-      };
-      groupsData.push(newGroup);
-      resolve(newGroup);
-    }, 300);
-  });
+export const addGroup = async (groupData) => {
+  try {
+    const response = await fetch(`${API_URL}/groups`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(groupData),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to add group: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error in addGroup:', error);
+    throw error;
+  }
 };
 
-export const updateGroup = (id, updatedData) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const index = groupsData.findIndex(group => group.id === parseInt(id));
-      if (index !== -1) {
-        groupsData[index] = { ...groupsData[index], ...updatedData };
-        resolve(groupsData[index]);
-      } else {
-        reject(new Error('Group not found'));
-      }
-    }, 300);
-  });
+export const updateGroup = async (id, updatedData) => {
+  try {
+    const response = await fetch(`${API_URL}/groups/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedData),
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to update group: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error in updateGroup:', error);
+    throw error;
+  }
 };
 
-export const deleteGroup = (id) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const index = groupsData.findIndex(group => group.id === parseInt(id));
-      if (index !== -1) {
-        const deletedGroup = groupsData.splice(index, 1)[0];
-        resolve(deletedGroup);
-      } else {
-        reject(new Error('Group not found'));
-      }
-    }, 300);
-  });
+export const deleteGroup = async (id) => {
+  try {
+    const response = await fetch(`${API_URL}/groups/${id}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to delete group: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error in deleteGroup:', error);
+    throw error;
+  }
 };
