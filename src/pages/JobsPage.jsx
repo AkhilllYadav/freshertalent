@@ -5,26 +5,18 @@ import { Layout } from '@/components/Layout';
 import { JobSearch } from '@/components/JobSearch';
 import { JobCard } from '@/components/JobCard';
 import { jobService } from '@/services/jobService';
-import { Job } from '@/types/job';
 import { Briefcase, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-interface SearchFilters {
-  search?: string; 
-  location?: string;
-  remote?: boolean;
-  tags?: string[];
-}
-
 const JobsPage = () => {
   const [searchParams] = useSearchParams();
   const isMobile = useIsMobile();
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobs, setJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState<SearchFilters>({
+  const [filters, setFilters] = useState({
     search: searchParams.get('search') || undefined,
     location: searchParams.get('location') || undefined,
     remote: searchParams.get('remote') === 'true',

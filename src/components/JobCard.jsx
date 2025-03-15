@@ -1,5 +1,4 @@
 
-import { Job } from '@/types/job';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
@@ -8,12 +7,7 @@ import { BriefcaseBusiness, MapPin, Clock, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface JobCardProps {
-  job: Job;
-  index?: number;
-}
-
-const formatSalary = (salary?: Job['salary']) => {
+const formatSalary = (salary) => {
   if (!salary) return 'Salary not specified';
   
   const { min, max, currency, period } = salary;
@@ -30,7 +24,7 @@ const formatSalary = (salary?: Job['salary']) => {
   return 'Salary not specified';
 };
 
-export const JobCard = ({ job, index = 0 }: JobCardProps) => {
+export const JobCard = ({ job, index = 0 }) => {
   const postedDate = new Date(job.postedAt);
   const timeAgo = formatDistanceToNow(postedDate, { addSuffix: true });
   
