@@ -1,17 +1,13 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
 import { JobPostForm } from '@/components/admin/JobPostForm';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { GroupsManager } from '@/components/admin/GroupsManager';
-import { CoursesManager } from '@/components/admin/CoursesManager';
 import { toast } from 'sonner';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('jobs');
   
   useEffect(() => {
     // Check if admin is logged in
@@ -37,31 +33,9 @@ const AdminDashboard = () => {
         </Button>
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="jobs">Manage Jobs</TabsTrigger>
-          <TabsTrigger value="courses">Manage Courses</TabsTrigger>
-          <TabsTrigger value="groups">Manage Groups</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="jobs" className="mt-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <JobPostForm />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="courses" className="mt-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <CoursesManager />
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="groups" className="mt-6">
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <GroupsManager />
-          </div>
-        </TabsContent>
-      </Tabs>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <JobPostForm />
+      </div>
     </Layout>
   );
 };

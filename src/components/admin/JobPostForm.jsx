@@ -1,181 +1,111 @@
 
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from 'sonner';
 import { jobService } from '@/services/jobService';
+import { toast } from 'sonner';
+import { BriefcaseBusiness } from 'lucide-react';
+import { JobFormFields } from './JobFormFields';
+import { BulkUploadSheet } from './BulkUploadSheet';
+
+const initialFormData = {
+  title: '',
+  companyName: '',
+  location: {
+    city: '',
+    state: '',
+    country: 'USA',
+    remote: false,
+  },
+  description: '',
+  employmentType: 'full-time',
+  applyUrl: '',
+};
 
 export const JobPostForm = () => {
-  const [formData, setFormData] = useState({
-    title: '',
-    company: '',
-    location: '',
-    salary: '',
-    type: 'Full-time',
-    description: '',
-    requirements: '',
-    contactEmail: ''
-  });
-  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFileUploadOpen, setIsFileUploadOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refresh key to force re-render
+
+  // Force a refresh when the component mounts
+  useEffect(() => {
+    console.log('JobPostForm refreshed');
+    // Force re-render by incrementing the refresh key
+    setRefreshKey(prevKey => prevKey + 1);
+  }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSelectChange = (value) => {
-    setFormData({
-      ...formData,
-      type: value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Convert requirements string to array
-      const jobData = {
-        ...formData,
-        requirements: formData.requirements.split('\n').filter(req => req.trim() !== '')
-      };
-
-      await jobService.addJob(jobData);
-      
-      setFormData({
-        title: '',
-        company: '',
-        location: '',
-        salary: '',
-        type: 'Full-time',
-        description: '',
-        requirements: '',
-        contactEmail: ''
+    const { name, value, type } = e.target;
+    
+    if (name.includes('.')) {
+      const [parent, child] = name.split('.');
+      setFormData(prev => {
+        if (parent === 'location') {
+          return {
+            ...prev,
+            location: {
+              ...prev.location,
+              [child]: type === 'checkbox' ? e.target.checked : value
+            }
+          };
+        }
+        return prev;
       });
-      
-      toast.success('Job posted successfully!');
-    } catch (error) {
-      console.error('Error posting job:', error);
-      toast.error('Failed to post job. Please try again.');
-    } finally {
-      setLoading(false);
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? e.target.checked : value
+      }));
     }
   };
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const newJob = {
+      title: formData.title,
+      companyName: formData.companyName,
+      location: formData.location,
+      description: formData.description,
+      employmentType: formData.employmentType,
+      applyUrl: formData.applyUrl
+    };
+
+    jobService.addJob(newJob)
+      .then(() => {
+        toast.success('Job posted successfully!');
+        setFormData(initialFormData);
+      })
+      .catch(error => {
+        console.error('Error posting job:', error);
+        toast.error('Failed to post job. Please try again.');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-4">Post a New Job</h2>
+    <div className="space-y-6" key={refreshKey}>
+      <div className="flex justify-between items-center flex-wrap gap-2">
+        <h2 className="text-xl font-semibold">Post a New Job</h2>
+        <BulkUploadSheet 
+          isOpen={isFileUploadOpen}
+          setIsOpen={setIsFileUploadOpen}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+        />
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Job Title*</label>
-            <Input 
-              name="title" 
-              value={formData.title} 
-              onChange={handleInputChange} 
-              placeholder="e.g., Frontend Developer"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Company*</label>
-            <Input 
-              name="company" 
-              value={formData.company} 
-              onChange={handleInputChange} 
-              placeholder="e.g., Acme Inc."
-              required
-            />
-          </div>
-        </div>
+        <JobFormFields
+          formData={formData}
+          handleInputChange={handleInputChange}
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Location*</label>
-            <Input 
-              name="location" 
-              value={formData.location} 
-              onChange={handleInputChange} 
-              placeholder="e.g., Remote, New York"
-              required
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Salary (optional)</label>
-            <Input 
-              name="salary" 
-              value={formData.salary} 
-              onChange={handleInputChange} 
-              placeholder="e.g., $80,000 - $100,000"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium mb-1">Job Type*</label>
-            <Select 
-              value={formData.type} 
-              onValueChange={handleSelectChange}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select job type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Full-time">Full-time</SelectItem>
-                <SelectItem value="Part-time">Part-time</SelectItem>
-                <SelectItem value="Contract">Contract</SelectItem>
-                <SelectItem value="Freelance">Freelance</SelectItem>
-                <SelectItem value="Internship">Internship</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Job Description*</label>
-          <Textarea 
-            name="description" 
-            value={formData.description} 
-            onChange={handleInputChange} 
-            placeholder="Enter job description..."
-            rows={5}
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Requirements* (one per line)</label>
-          <Textarea 
-            name="requirements" 
-            value={formData.requirements} 
-            onChange={handleInputChange} 
-            placeholder="Enter job requirements, one per line..."
-            rows={5}
-            required
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-1">Contact Email*</label>
-          <Input 
-            name="contactEmail" 
-            type="email"
-            value={formData.contactEmail} 
-            onChange={handleInputChange} 
-            placeholder="contact@company.com"
-            required
-          />
-        </div>
-        
-        <Button type="submit" disabled={loading}>
-          {loading ? 'Posting...' : 'Post Job'}
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? 'Submitting...' : 'Post Job'}
         </Button>
       </form>
     </div>
