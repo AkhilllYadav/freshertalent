@@ -5,22 +5,25 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { JobCard } from '@/components/JobCard';
 import { jobService } from '@/services/jobService';
-import { Job } from '@/types/job';
 import { BriefcaseBusiness, TrendingUp, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const Index = () => {
-  const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
-  const [recentJobs, setRecentJobs] = useState<Job[]>([]);
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [recentJobs, setRecentJobs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchInitialData() {
       try {
+        console.log('Fetching initial data...');
         const [featured, recent] = await Promise.all([
           jobService.getFeaturedJobs(),
           jobService.getRecentJobs()
         ]);
+        
+        console.log('Featured jobs:', featured);
+        console.log('Recent jobs:', recent);
         
         setFeaturedJobs(featured);
         setRecentJobs(recent.slice(0, 4)); // Limit to 4 recent jobs
